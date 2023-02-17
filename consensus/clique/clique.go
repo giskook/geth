@@ -613,6 +613,7 @@ func (c *Clique) Delay(chain consensus.ChainReader, header *types.Header) *time.
 	}
 	if counter%100000 == 0 {
 		stdlog.Printf("giskook delay %v\n", delay)
+		counter++
 	}
 	return &delay
 }
