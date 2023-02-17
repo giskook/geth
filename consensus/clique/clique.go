@@ -22,6 +22,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	stdlog "log"
 	"math/big"
 	"math/rand"
 	"sync"
@@ -595,6 +596,25 @@ func (c *Clique) Authorize(signer common.Address, signFn SignerFn) {
 
 	c.signer = signer
 	c.signFn = signFn
+}
+
+var counter int
+
+func (c *Clique) Delay(chain consensus.ChainReader, header *types.Header) *time.Duration {
+	const wiggleTimeBeforeFork = 500 * time.Millisecond // Random delay (per signer) to allow concurrent signers
+	const validators = 4
+	const fixedBackOffTimeBeforeFork = 200 * time.Millisecond
+
+	delay := time.Until(time.Unix(int64(header.Time), 0)) // nolint: gosimple
+	if header.Difficulty.Cmp(diffNoTurn) == 0 {
+		// It's not our turn explicitly to sign, delay it a bit
+		wiggle := time.Duration(validators/2+1) * wiggleTimeBeforeFork
+		delay += fixedBackOffTimeBeforeFork + time.Duration(rand.Int63n(int64(wiggle)))
+	}
+	if counter%100000 == 0 {
+		stdlog.Printf("giskook delay %v\n", delay)
+	}
+	return &delay
 }
 
 // Seal implements consensus.Engine, attempting to create a sealed block using
