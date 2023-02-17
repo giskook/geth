@@ -127,6 +127,7 @@ var (
 		utils.MinerEtherbaseFlag,
 		utils.MinerExtraDataFlag,
 		utils.MinerRecommitIntervalFlag,
+		utils.MinerDelayLeftoverFlag,
 		utils.MinerNoVerifyFlag,
 		utils.MinerNewPayloadTimeout,
 		utils.NATFlag,

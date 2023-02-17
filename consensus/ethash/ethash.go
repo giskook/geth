@@ -20,6 +20,7 @@ package ethash
 import (
 	"errors"
 	"fmt"
+	"github.com/ethereum/go-ethereum/core/types"
 	"math"
 	"math/big"
 	"math/rand"
@@ -675,6 +676,10 @@ func (ethash *Ethash) Hashrate() float64 {
 
 	// Gather total submitted hash rate of remote sealers.
 	return ethash.hashrate.Rate1() + float64(<-res)
+}
+
+func (ethhash *Ethash) Delay(chain consensus.ChainReader, header *types.Header) *time.Duration {
+	return nil
 }
 
 // APIs implements consensus.Engine, returning the user facing RPC APIs.

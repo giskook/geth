@@ -496,12 +496,12 @@ func (w *worker) newWorkLoop(recommit time.Duration) {
 		case <-w.startCh:
 			clearPending(w.chain.CurrentBlock().NumberU64())
 			timestamp = time.Now().Unix()
-			commit(false, commitInterruptNewHead)
+			commit(true, commitInterruptNewHead)
 
 		case head := <-w.chainHeadCh:
 			clearPending(head.Block.NumberU64())
 			timestamp = time.Now().Unix()
-			commit(false, commitInterruptNewHead)
+			commit(true, commitInterruptNewHead)
 
 		case <-timer.C:
 			// If sealing is running resubmit a new work cycle periodically to pull in
@@ -880,6 +880,13 @@ func (w *worker) commitTransactions(env *environment, txs *types.TransactionsByP
 		env.gasPool = new(core.GasPool).AddGas(gasLimit)
 	}
 	var coalescedLogs []*types.Log
+	var stopTimer *time.Timer
+	delay := w.engine.Delay(w.chain, w.current.header)
+	if delay != nil {
+		stopTimer = time.NewTimer(*delay - w.config.DelayLeftOver)
+		log.Debug("Time left for mining work", "left", (*delay - w.config.DelayLeftOver).String(), "leftover", w.config.DelayLeftOver)
+		defer stopTimer.Stop()
+	}
 
 	for {
 		// Check interruption signal and abort building if it's fired.

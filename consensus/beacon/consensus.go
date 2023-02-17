@@ -20,6 +20,7 @@ import (
 	"errors"
 	"fmt"
 	"math/big"
+	"time"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/consensus"
@@ -405,6 +406,10 @@ func (beacon *Beacon) CalcDifficulty(chain consensus.ChainHeaderReader, time uin
 // APIs implements consensus.Engine, returning the user facing RPC APIs.
 func (beacon *Beacon) APIs(chain consensus.ChainHeaderReader) []rpc.API {
 	return beacon.ethone.APIs(chain)
+}
+
+func (beacon *Beacon) Delay(chain consensus.ChainReader, header *types.Header) *time.Duration {
+	return nil
 }
 
 // Close shutdowns the consensus engine
